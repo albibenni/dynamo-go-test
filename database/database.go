@@ -24,13 +24,13 @@ type DynamoDBClient struct {
 	databaseStore *dynamodb.DynamoDB
 }
 
-func NewDynamoDBClient() DynamoDBClient {
+func NewDynamoDBClient() (DynamoDBClient, error) {
 	dbSession := session.Must(session.NewSession())
 	db := dynamodb.New(dbSession, aws.NewConfig().WithEndpoint("http://localhost:8000"))
 
 	return DynamoDBClient{
 		databaseStore: db,
-	}
+	}, nil
 }
 
 // Does this user exists?
