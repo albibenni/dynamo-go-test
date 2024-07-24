@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	TABLE_NAME = "userTable"
+	TABLE_NAME = "test-db"
 )
 
 type UserStore interface {
