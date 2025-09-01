@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"github.com/albibenni/dynamo-go-test/database"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	dynamodbUtil "github.com/helloworldless/dynamodb-reference/dynamodb"
 	"log"
 	"math/rand"
 	"strconv"
@@ -19,9 +19,9 @@ func main() {
 	log.Println("starting")
 	port := 8000
 	log.Printf("creating DynaomDB client for DynamoDB Local running on port %d\n", port)
-	dynamodbClient := dynamodbUtil.CreateLocalClient(port)
+	dynamodbClient, _ := database.CreateLocalClient(port)
 	log.Printf("creating table '%s' if it does not already exist\n", tableName)
-	didCreateTable := dynamodbUtil.CreateTableIfNotExists(dynamodbClient, tableName)
+	didCreateTable := database.CreateTableIfNotExists(dynamodbClient, tableName)
 	log.Printf("did create table '%s'? %v\n", tableName, didCreateTable)
 	log.Println("running conditional check failure example")
 	putItemConditionCheckFailureExample(dynamodbClient)
@@ -58,7 +58,7 @@ func putItemConditionCheckFailureExample(dynamodbClient *dynamodb.Client) {
 		log.Fatal("expected duplicate PutItem request to fail with condition check failure, but it did not")
 	}
 
-	if dynamodbUtil.IsConditionalCheckFailure(err) {
+	if database.IsConditionalCheckFailure(err) {
 		log.Println("as expected: condition check failure error", err)
 	} else {
 		log.Println("unexpected error", err)
@@ -66,7 +66,7 @@ func putItemConditionCheckFailureExample(dynamodbClient *dynamodb.Client) {
 }
 
 func seedItems(dynamodbClient *dynamodb.Client) {
-	dynamodbUtil.CreateTableIfNotExists(dynamodbClient, tableName)
+	database.CreateTableIfNotExists(dynamodbClient, tableName)
 	for i := 0; i < 500; i++ {
 		item := map[string]types.AttributeValue{
 			"PK":            &types.AttributeValueMemberS{Value: "PK-" + strconv.Itoa(i)},
@@ -99,7 +99,7 @@ func putItem(d *dynamodb.Client, tableName string, item map[string]types.Attribu
 }
 
 func deleteAllItems(dynamodbClient *dynamodb.Client) {
-	err := dynamodbUtil.DeleteAllItems(dynamodbClient, tableName)
+	err := database.DeleteAllItems(dynamodbClient, tableName)
 	if err != nil {
 		log.Fatal("failed to delete all items", err)
 	}
